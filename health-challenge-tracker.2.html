@@ -1,0 +1,53 @@
+<div class="container mx-auto p-4">
+  <h1 class="text-2xl font-bold mb-4">Health Challenge Tracker</h1>
+  
+  <div class="mb-4 flex space-x-4">
+    <input
+      type="text"
+      placeholder="Search by name"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="filterUsers()"
+      class="p-2 border rounded"
+    >
+    <select
+      [(ngModel)]="workoutTypeFilter"
+      (ngModelChange)="filterUsers()"
+      class="p-2 border rounded"
+    >
+      <option value="">All workout types</option>
+      <option *ngFor="let type of workoutTypes" [value]="type">{{ type }}</option>
+    </select>
+  </div>
+
+  <table class="w-full border-collapse border">
+    <thead>
+      <tr>
+        <th class="border p-2">Name</th>
+        <th class="border p-2">Workouts</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of pagedUsers">
+        <td class="border p-2">{{ user.name }}</td>
+        <td class="border p-2">
+          <div *ngFor="let workout of user.workouts">
+            {{ workout.type }}: {{ workout.minutes }} minutes
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="mt-4 flex justify-center space-x-2">
+    <button
+      *ngFor="let page of [].constructor(totalPages); let i = index"
+      (click)="changePage(i + 1)"
+      [class.bg-blue-500]="currentPage === i + 1"
+      [class.text-white]="currentPage === i + 1"
+      class="px-3 py-1 border rounded"
+    >
+      {{ i + 1 }}
+    </button>
+  </div>
+</div>
+

@@ -1,0 +1,55 @@
+import { Component, type OnInit } from "@angular/core"
+import type { UserService } from "../services/user.service"
+import type { User } from "../models/user.model"
+
+@Component({
+  selector: "app-health-challenge-tracker",
+  templateUrl: "./health-challenge-tracker.component.html",
+  styleUrls: ["./health-challenge-tracker.component.css"],
+})
+export class HealthChallengeTrackerComponent implements OnInit {
+  users: User[] = []
+  filteredUsers: User[] = []
+  searchTerm = ""
+  workoutTypeFilter = ""
+  workoutTypes: string[] = []
+  currentPage = 1
+  usersPerPage = 2
+
+  constructor(private userService: UserService) {}
+
+  ngOnInit(): void {
+    this.userService.getUsers().subscribe((users) => {
+      this.users = users
+      this.filteredUsers = users
+      this.updateWorkoutTypes()
+    })
+  }
+
+  updateWorkoutTypes(): void {
+    this.workoutTypes = Array.from(new Set(this.users.flatMap((user) => user.workouts.map((w) => w.type))))
+  }
+
+  filterUsers(): void {
+    this.filteredUsers = this.users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(this.searchTerm.toLowerCase()) &&
+        (this.workoutTypeFilter === "" || user.workouts.some((w) => w.type === this.workoutTypeFilter)),
+    )
+    this.currentPage = 1
+  }
+
+  get pagedUsers(): User[] {
+    const startIndex = (this.currentPage - 1) * this.usersPerPage
+    return this.filteredUsers.slice(startIndex, startIndex + this.usersPerPage)
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredUsers.length / this.usersPerPage)
+  }
+
+  changePage(page: number): void {
+    this.currentPage = page
+  }
+}
+
